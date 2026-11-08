@@ -1,6 +1,7 @@
 /*  include/HashTable.h */
 #pragma once
 #include <bits/stdc++.h>
+#include "Registro.h"
 
 using namespace std;
 
