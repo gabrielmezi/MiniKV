@@ -15,6 +15,14 @@ struct Registro {
     string clave;
     string valor;
     TipoDato tipo = TipoDato::STRING;
-    bool TieneTTL = false;
-    time_t expiresAt = 0;
+    bool estadoTTL = false;
+    time_t expira = 0;
+
+    Registro(string c, string v, TipoDato t, bool ttl, time_t ex) {
+        clave = c;
+        valor = v;
+        tipo = t;
+        estadoTTL = ttl;
+        expira = ex;
+    }
 };
