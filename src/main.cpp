@@ -12,11 +12,17 @@ int main() {
         "lenin", 
         "profesor", 
         TipoDato::STRING, 
-        false, 
+        false,
         0
     };
 
     ht.insertar(r1);
+    ht.imprimir();
+    
+    Registro* busqueda = ht.buscar("lenin");
+    if (busqueda) cout << busqueda->valor << endl << endl;
+    
+    ht.eliminar("lenin");
     ht.imprimir();
 
     delete r1;

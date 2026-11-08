@@ -39,9 +39,9 @@ void HashTable::rehash(int nuevaCapacidad) {
 
 
 HashTable::HashTable(int cap) {
-    capacidad = cap;
+    capacidad = (cap > 0) ? cap : 8;
     tabla.assign(capacidad, nullptr);
-    }
+}
 
 
 HashTable::~HashTable() {
@@ -57,18 +57,24 @@ HashTable::~HashTable() {
 
 
 void HashTable::insertar(Registro* r) {
-    if ((double)elementos / capacidad >= 0.75) {
-        rehash(capacidad * 2);
-    }
     int index = hashFuncion(r->clave);
     Nodo* actual = tabla[index];
+    
     while (actual != nullptr) {
         if (actual->registro->clave == r->clave) {
             actual->registro->valor = r->valor;
+            actual->registro->tipo = r->tipo;
+            actual->registro->estadoTTL = r->estadoTTL;
+            actual->registro->expira = r->expira;
             return;
         }
         actual = actual->siguiente;
     }
+
+    if ((double)elementos / capacidad >= 0.75) {
+        rehash(capacidad * 2);
+    }
+
     Nodo* nuevo = new Nodo(r);
     nuevo->siguiente = tabla[index];
     tabla[index] = nuevo;
