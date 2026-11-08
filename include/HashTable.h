@@ -27,7 +27,7 @@ public:
 
     void insertar(Registro* r);
 
-    int* buscar(string clave);
+    Registro* buscar(string clave);
 
     bool eliminar(string clave);
 

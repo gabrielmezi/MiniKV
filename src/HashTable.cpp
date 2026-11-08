@@ -82,7 +82,7 @@ Registro* HashTable::buscar(string clave) {
     Nodo* actual = tabla[index];
     while (actual != nullptr) {
         if (actual->registro->clave == clave) {
-            return actual->registro->valor;
+            return actual->registro;
         }
         actual = actual->siguiente;
     }
