@@ -2,11 +2,13 @@
 #include <bits/stdc++.h>
 #include "../include/HashTable.h"
 #include "../include/Registro.h"
+#include "../include/ArbolAVL.h"
 
 using namespace std;
 
 int main() {
     HashTable ht(5);
+    ArbolAVL avl;
 
     Registro* r1 = new Registro{
         "lenin", 
@@ -16,15 +18,26 @@ int main() {
         0
     };
 
-    ht.insertar(r1);
-    ht.imprimir();
-    
-    Registro* busqueda = ht.buscar("lenin");
-    if (busqueda) cout << busqueda->valor << endl << endl;
-    
-    ht.eliminar("lenin");
-    ht.imprimir();
+    Registro* r2 = new Registro{
+        "salazar", 
+        "imbecil", 
+        TipoDato::STRING, 
+        false,
+        0
+    };
 
-    delete r1;
+    Registro* r3 = new Registro{
+        "chucky", 
+        "ure", 
+        TipoDato::STRING, 
+        false,
+        0
+    };
+
+    avl.insertar(r1);
+    avl.insertar(r2);
+    avl.insertar(r3);
+    avl.imprimir();
+
     return 0;
 }
