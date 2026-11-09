@@ -145,3 +145,65 @@ void ArbolAVL::liberar(NodoAVL* nodo) {
 ArbolAVL::~ArbolAVL() {
     liberar(raiz);
 }
+
+Registro* ArbolAVL::buscar(string clave) {
+    NodoAVL* actual = raiz;
+
+    while (actual != nullptr) {
+        if (clave == actual->registro->clave) {
+            return actual->registro;
+        } 
+        else if (clave < actual->registro->clave) {
+            actual = actual->izquierda;
+        } 
+        else {
+            actual = actual->derecha;
+        }
+    }
+
+    return nullptr;
+}
+
+ArbolAVL::NodoAVL* ArbolAVL::minimo(NodoAVL* nodo) {
+    while (nodo->izquierda != nullptr) {
+        nodo = nodo->izquierda;
+    }
+    return nodo;
+}
+
+
+ArbolAVL::NodoAVL* ArbolAVL::eliminar(NodoAVL* nodo, string clave) {
+    if (nodo == nullptr) {
+        return nullptr;
+    }
+
+    if (clave < nodo->registro->clave) {
+        nodo->izquierda = eliminar(nodo->izquierda, clave);
+    }
+    else if (clave > nodo->registro->clave) {
+        nodo->derecha = eliminar(nodo->derecha, clave);
+    }
+    else {
+        if (nodo->izquierda == nullptr) {
+            NodoAVL* temp = nodo->derecha;
+            delete nodo;
+            return temp;
+        }
+        else if (nodo->derecha == nullptr) {
+            NodoAVL* temp = nodo->izquierda;
+            delete nodo;
+            return temp;
+        }
+        else {
+            NodoAVL* sucesor = minimo(nodo->derecha);
+            nodo->registro = sucesor->registro;
+            nodo->derecha = eliminar(nodo->derecha, sucesor->registro->clave);
+        }
+    }
+
+    return rebalancear(nodo);
+}
+
+void ArbolAVL::eliminar(string clave) {
+    raiz = eliminar(raiz, clave);
+}

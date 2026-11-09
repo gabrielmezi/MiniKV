@@ -39,5 +39,24 @@ int main() {
     avl.insertar(r3);
     avl.imprimir();
 
+    Registro* busqueda2 = avl.buscar("carlos");
+    if (!busqueda2) {
+        cout << "Carlos no existe" << endl;
+    }
+
+    Registro* busqueda = avl.buscar("chucky");
+    if (busqueda) {
+        cout << "Encontrado: " << busqueda->valor << endl;
+    } else {
+        cout << "Registro no encontrado" << endl;
+    }
+
+    avl.eliminar("chucky");
+    avl.imprimir();
+
+    delete r1;
+    delete r2;
+    delete r3;
+
     return 0;
 }
