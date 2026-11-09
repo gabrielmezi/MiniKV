@@ -35,7 +35,11 @@ private:
     void liberar(NodoAVL* nodo);
 
     NodoAVL* minimo(NodoAVL* nodo);
+    NodoAVL* maximo(NodoAVL* nodo);
 
+    void rango(NodoAVL* nodo, string inicio, string fin, vector<Registro*>& resultados, int limite);
+
+    void prefijo(NodoAVL* nodo, string p, vector<Registro*>& resultados, int limite);
 public:
     ArbolAVL();
     ~ArbolAVL();
@@ -44,4 +48,14 @@ public:
     Registro* buscar(string clave);
     void eliminar(string clave);
     void imprimir();
+
+    Registro* obtenerMinimo();
+    Registro* obtenerMaximo();
+
+    Registro* sucesor(string clave);
+    Registro* predecesor(string clave);
+    vector<Registro*> rango(string inicio, string fin, int limite = -1);
+    vector<Registro*> prefijo(string p, int limite = -1);
 };
+
+

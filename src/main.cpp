@@ -46,9 +46,50 @@ int main() {
 
     Registro* busqueda = avl.buscar("chucky");
     if (busqueda) {
-        cout << "Encontrado: " << busqueda->valor << endl;
+        cout << "Encontrado: " << busqueda->valor << endl << endl;
     } else {
-        cout << "Registro no encontrado" << endl;
+        cout << "Registro no encontrado" << endl << endl;
+    }
+
+    Registro* menor = avl.obtenerMinimo();
+    Registro* mayor = avl.obtenerMaximo();
+
+    if (menor) {
+        cout << "MIN: " << menor->clave << endl;
+    }
+
+    if (mayor) {
+        cout << "MAX: " << mayor->clave << endl << endl;
+    }
+
+    Registro* sig = avl.sucesor("lenin");
+    Registro* ant = avl.predecesor("lenin");
+
+    if (sig) {
+        cout << "Sucesor: " << sig->clave << endl;
+    } else {
+        cout << "No existe sucesor" << endl;
+    }
+
+    if (ant) {
+        cout << "Predecesor: " << ant->clave << endl;
+    } else {
+        cout << "No existe predecesor" << endl;
+    }
+
+    vector<Registro*> resultados = avl.rango("chucky", "salazar");
+    cout << "----- RANGE ----" << endl;
+
+    for (Registro* r : resultados) {
+        cout << r->clave << ": " << r->valor << endl;
+    }
+
+    vector<Registro*> resultadosPref = avl.prefijo("ch");
+
+    cout << "---- PREFIX ----" << endl;
+
+    for (Registro* r : resultadosPref) {
+        cout << r->clave << ": " << r->valor << endl;
     }
 
     avl.eliminar("chucky");
@@ -60,3 +101,4 @@ int main() {
 
     return 0;
 }
+
