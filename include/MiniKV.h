@@ -56,4 +56,5 @@ public:
     void stats();
 
     bool save(string archivo);
+    bool load(string archivo);
 };
