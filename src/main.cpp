@@ -189,7 +189,7 @@ int main() {
     cout << "EXISTS sesion: "
         << kv.exists("sesion") << endl;
     
-    cout << endl << "--- prueba stats con hash colisiones ---" << endl;
+    cout << endl << "--- prueba hash colisiones ---" << endl;
 
     HashTable pruebaHash(5);
 
@@ -197,6 +197,49 @@ int main() {
     cout << "Capacidad: " << pruebaHash.obtenerCapacidad() << endl;
     cout << "Colisiones: " << pruebaHash.contarColisiones() << endl;
     
+    cout << endl << "--- stats ---" << endl;
+
+    kv.set("edad", "20", TipoDato::INT);
+    kv.set("promedio", "16.5", TipoDato::FLOAT);
+    kv.set("activo", "true", TipoDato::BOOL);
+    kv.set("nombre", "Gabriel", TipoDato::STRING);
+
+    kv.stats();
+
+    cout << endl << "--- CAMBIO DE TIPOS ---" << endl;
+
+    kv.set("edad", "veinte", TipoDato::STRING);
+    kv.del("promedio");
+
+    kv.stats();
+
+    cout << endl << "--- PRUEBA DE COLISIONES ---" << endl;
+
+    HashTable pruebaHash2(2);
+
+    Registro* a = new Registro("ana", "1", TipoDato::STRING, false, 0);
+    Registro* b = new Registro("carlos", "2", TipoDato::STRING, false, 0);
+    Registro* c = new Registro("lenin", "3", TipoDato::STRING, false, 0);
+
+    pruebaHash2.insertar(a);
+    pruebaHash2.insertar(b);
+    pruebaHash2.insertar(c);
+
+    cout << "Elementos: " << pruebaHash2.obtenerElementos() << endl;
+    cout << "Capacidad: " << pruebaHash2.obtenerCapacidad() << endl;
+    cout << "Colisiones: " << pruebaHash2.contarColisiones() << endl;
+
+    pruebaHash2.imprimir();
+
+    pruebaHash2.eliminar("carlos");
+
+    cout << "Colisiones despues de eliminar: "
+        << pruebaHash2.contarColisiones() << endl;
+
+    delete a;
+    delete b;
+    delete c;
+
     return 0;
 }
 

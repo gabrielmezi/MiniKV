@@ -14,8 +14,15 @@ private:
     ArbolAVL arbol;
     MinHeap heapTTL;
     unsigned long long siguienteVersion = 0;
+    int cantidadString = 0;
+    int cantidadInt = 0;
+    int cantidadFloat = 0;
+    int cantidadBool = 0;
 
     void limpiarExpirados();
+    
+    void aumentarTipo(TipoDato tipo);
+    void disminuirTipo(TipoDato tipo);
 public:
     MiniKV();
     ~MiniKV();
@@ -45,4 +52,7 @@ public:
 
     bool expire(string clave, int segundos);
     int ttl(string clave);
+
+    void stats();
+
 };

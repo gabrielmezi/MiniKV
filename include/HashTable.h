@@ -17,6 +17,7 @@ private:
     vector<Nodo*> tabla; 
     int capacidad;
     int elementos = 0;
+    int colisiones = 0;
 
     int hashFuncion(string clave);
     void rehash(int nuevaCapacidad);
@@ -37,4 +38,5 @@ public:
     int obtenerElementos();
     int obtenerCapacidad();
     int contarColisiones();
+
 };

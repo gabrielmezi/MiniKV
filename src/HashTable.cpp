@@ -12,20 +12,26 @@ Nodo::Nodo(Registro* r) {
 
 
 int HashTable::hashFuncion(string clave) {
-    int h = 5381;
-    for (char c : clave) {
-        h = h * 33 + (int)c;
+    unsigned long long h = 5381;
+
+    for (unsigned char c : clave) {
+        h = h * 33 + c;
     }
-    return abs(h) % capacidad;
+
+    return h % capacidad;
 }
 
 
 void HashTable::rehash(int nuevaCapacidad) {
     vector<Nodo*> viejaTabla = tabla;
     int viejaCapacidad = capacidad;
+
     capacidad = nuevaCapacidad;
     tabla.assign(capacidad, nullptr);
+
     elementos = 0;
+    colisiones = 0;
+
     for (int i = 0; i < viejaCapacidad; i++) {
         Nodo* actual = viejaTabla[i];
         while (actual != nullptr) {
@@ -36,6 +42,7 @@ void HashTable::rehash(int nuevaCapacidad) {
         }
     }
 }
+
 
 
 HashTable::HashTable(int cap) {
@@ -58,26 +65,34 @@ HashTable::~HashTable() {
 
 void HashTable::insertar(Registro* r) {
     int index = hashFuncion(r->clave);
+
     Nodo* actual = tabla[index];
-    
+
     while (actual != nullptr) {
         if (actual->registro->clave == r->clave) {
             actual->registro->valor = r->valor;
             actual->registro->tipo = r->tipo;
             actual->registro->estadoTTL = r->estadoTTL;
             actual->registro->expira = r->expira;
+            actual->registro->versionTTL = r->versionTTL;
             return;
         }
         actual = actual->siguiente;
     }
 
-    if ((double)elementos / capacidad >= 0.75) {
+    if ((double)(elementos + 1) / capacidad > 0.75) {
         rehash(capacidad * 2);
+        index = hashFuncion(r->clave);
+    }
+
+    if (tabla[index] != nullptr) {
+        colisiones++;
     }
 
     Nodo* nuevo = new Nodo(r);
     nuevo->siguiente = tabla[index];
     tabla[index] = nuevo;
+
     elementos++;
 }
 
@@ -98,25 +113,29 @@ Registro* HashTable::buscar(string clave) {
 
 bool HashTable::eliminar(string clave) {
     int index = hashFuncion(clave);
+
     Nodo* actual = tabla[index];
     Nodo* anterior = nullptr;
 
     while (actual != nullptr) {
         if (actual->registro->clave == clave) {
+            if (tabla[index]->siguiente != nullptr) {
+                colisiones--;
+            }
             if (anterior == nullptr) {
                 tabla[index] = actual->siguiente;
-            } else {
+            }
+            else {
                 anterior->siguiente = actual->siguiente;
             }
-
             delete actual;
             elementos--;
             return true;
         }
-
         anterior = actual;
         actual = actual->siguiente;
     }
+
     return false;
 }
 
@@ -153,20 +172,5 @@ int HashTable::obtenerCapacidad() {
 }
 
 int HashTable::contarColisiones() {
-    int colisiones = 0;
-
-    for (int i = 0; i < capacidad; i++) {
-        Nodo* actual = tabla[i];
-
-        if (actual != nullptr) {
-            actual = actual->siguiente;
-
-            while (actual != nullptr) {
-                colisiones++;
-                actual = actual->siguiente;
-            }
-        }
-    }
-
     return colisiones;
 }

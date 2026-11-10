@@ -11,6 +11,11 @@ bool MiniKV::set(string clave, string valor, TipoDato tipo) {
     Registro* existente = get(clave);
 
     if (existente != nullptr) {
+        if (existente->tipo != tipo) {
+            disminuirTipo(existente->tipo);
+            aumentarTipo(tipo);
+        }
+
         existente->valor = valor;
         existente->tipo = tipo;
 
@@ -25,6 +30,8 @@ bool MiniKV::set(string clave, string valor, TipoDato tipo) {
 
     hash.insertar(nuevo);
     arbol.insertar(nuevo);
+
+    aumentarTipo(tipo);
 
     return true;
 }
@@ -68,6 +75,8 @@ bool MiniKV::del(string clave) {
     if (registro == nullptr) {
         return false;
     }
+
+    disminuirTipo(registro->tipo);
 
     arbol.eliminar(clave);
     hash.eliminar(clave);
@@ -191,5 +200,37 @@ void MiniKV::limpiarExpirados() {
 
             del(evento.clave);
         }
+    }
+}
+
+void MiniKV::stats() {
+    limpiarExpirados();
+
+    cout << "----- STATS -----" << endl;
+    cout << "Elementos: " << hash.obtenerElementos() << endl;
+    cout << "Capacidad HashTable: " << hash.obtenerCapacidad() << endl;
+    cout << "Colisiones actuales: " << hash.contarColisiones() << endl;
+
+    cout << "STRING: " << cantidadString << endl;
+    cout << "INT: " << cantidadInt << endl;
+    cout << "FLOAT: " << cantidadFloat << endl;
+    cout << "BOOL: " << cantidadBool << endl;
+}
+
+void MiniKV::aumentarTipo(TipoDato tipo) {
+    switch (tipo) {
+        case TipoDato::STRING: cantidadString++; break;
+        case TipoDato::INT: cantidadInt++; break;
+        case TipoDato::FLOAT: cantidadFloat++; break;
+        case TipoDato::BOOL: cantidadBool++; break;
+    }
+}
+
+void MiniKV::disminuirTipo(TipoDato tipo) {
+    switch (tipo) {
+        case TipoDato::STRING: cantidadString--; break;
+        case TipoDato::INT: cantidadInt--; break;
+        case TipoDato::FLOAT: cantidadFloat--; break;
+        case TipoDato::BOOL: cantidadBool--; break;
     }
 }
