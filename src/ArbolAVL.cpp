@@ -331,3 +331,73 @@ vector<Registro*> ArbolAVL::prefijo(string p, int limite) {
 
     return resultados;
 }
+
+
+int ArbolAVL::contarMenores(string clave) {
+    NodoAVL* actual = raiz;
+    int contador = 0;
+
+    while (actual != nullptr) {
+        if (clave <= actual->registro->clave) {
+            actual = actual->izquierda;
+        }
+        else {
+            contador += 1 + obtenerTamano(actual->izquierda);
+            actual = actual->derecha;
+        }
+    }
+
+    return contador;
+}
+
+
+int ArbolAVL::contarMenoresIguales(string clave) {
+    NodoAVL* actual = raiz;
+    int contador = 0;
+
+    while (actual != nullptr) {
+        if (clave < actual->registro->clave) {
+            actual = actual->izquierda;
+        }
+        else {
+            contador += 1 + obtenerTamano(actual->izquierda);
+            actual = actual->derecha;
+        }
+    }
+
+    return contador;
+}
+
+int ArbolAVL::contarRango(string inicio, string fin) {
+    if (inicio > fin) return 0;
+
+    return contarMenoresIguales(fin) - contarMenores(inicio);
+}
+
+
+void ArbolAVL::dump(NodoAVL* nodo, vector<Registro*>& resultados, int limite) {
+    if (nodo == nullptr) return;
+
+    if (limite >= 0 && (int)resultados.size() >= limite) return;
+
+    dump(nodo->izquierda, resultados, limite);
+
+    if (limite < 0 || (int)resultados.size() < limite) {
+        resultados.push_back(nodo->registro);
+    }
+
+    if (limite < 0 || (int)resultados.size() < limite) {
+        dump(nodo->derecha, resultados, limite);
+    }
+}
+
+vector<Registro*> ArbolAVL::dump(int limite) {
+    vector<Registro*> resultados;
+
+    if (limite == 0) return resultados;
+
+    dump(raiz, resultados, limite);
+
+    return resultados;
+}
+

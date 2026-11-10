@@ -3,9 +3,103 @@
 #include "../include/HashTable.h"
 #include "../include/Registro.h"
 #include "../include/ArbolAVL.h"
+#include "../include/MiniKV.h"
 
 using namespace std;
 
+int main() {
+    MiniKV kv;
+
+    kv.set("lenin", "profesor");
+    kv.set("salazar", "imbecil");
+    kv.set("chucky", "ure");
+
+    Registro* r = kv.get("chucky");
+
+    if (r != nullptr) {
+        cout << "GET chucky: " << r->valor << endl;
+    }
+
+    kv.set("chucky", "actualizado");
+
+    r = kv.get("chucky");
+
+    if (r != nullptr) {
+        cout << "GET actualizado: " << r->valor << endl;
+    }
+
+    kv.del("chucky");
+
+    r = kv.get("chucky");
+
+    if (r == nullptr) {
+        cout << "Chucky fue eliminado" << endl;
+    }
+
+
+    kv.set("lenin", "profesor");
+    kv.set("chucky", "ure");
+
+    cout << "EXISTS lenin: " << kv.exists("lenin") << endl;
+    cout << "EXISTS carlos: " << kv.exists("carlos") << endl;
+
+    kv.del("lenin");
+
+    cout << "EXISTS lenin despues de DEL: "
+        << kv.exists("lenin") << endl;
+
+    kv.set("ana", "estudiante");
+    kv.set("carlos", "ingeniero");
+    kv.set("pedro", "docente");
+
+    cout << endl << "--- RANGE ---" << endl;
+
+    vector<Registro*> resultados = kv.range("ana", "pedro");
+
+    for (Registro* r : resultados) {
+        cout << r->clave << ": " << r->valor << endl;
+    }
+
+    cout << endl << "--- COUNT ---" << endl;
+    cout << kv.count("ana", "pedro") << endl;
+
+    cout << endl << "--- MIN Y MAX ---" << endl;
+
+    Registro* menor = kv.min();
+    Registro* mayor = kv.max();
+
+    if (menor) cout << "MIN: " << menor->clave << endl;
+    if (mayor) cout << "MAX: " << mayor->clave << endl;
+
+    cout << endl << "--- ELIMINACION ---" << endl;
+
+    kv.del("carlos");
+
+    cout << "EXISTS carlos: " << kv.exists("carlos") << endl;
+    cout << "COUNT ana-pedro: " << kv.count("ana", "pedro") << endl;
+
+    vector<Registro*> prueba = kv.range("ana", "pedro");
+
+    for (Registro* r : prueba) {
+        cout << r->clave << ": " << r->valor << endl;
+    }
+
+    cout << endl << "--- TTL ---" << endl;
+
+    kv.set("temporal", "hola");
+    kv.expire("temporal", 3);
+
+    cout << "Antes: " << (kv.get("temporal") != nullptr) << endl;
+
+    this_thread::sleep_for(chrono::seconds(4));
+
+    cout << "Despues: " << (kv.get("temporal") != nullptr) << endl;
+    cout << "EXISTS: " << kv.exists("temporal") << endl;
+
+    return 0;
+}
+
+/*
 int main() {
     HashTable ht(5);
     ArbolAVL avl;
@@ -92,8 +186,28 @@ int main() {
         cout << r->clave << ": " << r->valor << endl;
     }
 
+    cout << "--- COUNT ---" << endl;
+    cout << "COUNT chucky-salazar: "
+     << avl.contarRango("chucky", "salazar") << endl;
+
+    cout << "COUNT chucky-lenin: "
+        << avl.contarRango("chucky", "lenin") << endl;
+
+    cout << "COUNT a-b: "
+        << avl.contarRango("a", "b") << endl;
+
+    
+
     avl.eliminar("chucky");
     avl.imprimir();
+
+    vector<Registro*> resultadosDump = avl.dump(2);
+
+    cout << "---- DUMP ----" << endl;
+
+    for (Registro* r : resultadosDump) {
+        cout << r->clave << ": " << r->valor << endl;
+    }
 
     delete r1;
     delete r2;
@@ -101,4 +215,6 @@ int main() {
 
     return 0;
 }
+*/
+
 
