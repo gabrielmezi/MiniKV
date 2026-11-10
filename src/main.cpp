@@ -96,6 +96,99 @@ int main() {
     cout << "Despues: " << (kv.get("temporal") != nullptr) << endl;
     cout << "EXISTS: " << kv.exists("temporal") << endl;
 
+    cout << endl << "--- PRUEBA TTL ---" << endl;
+
+    kv.set("usuario", "Gabriel");
+
+    cout << "TTL sin EXPIRE: " << kv.ttl("usuario") << endl;
+
+    kv.expire("usuario", 5);
+
+    cout << "TTL inicial: " << kv.ttl("usuario") << endl;
+
+    this_thread::sleep_for(chrono::seconds(2));
+
+    cout << "TTL despues de 2 segundos: "
+        << kv.ttl("usuario") << endl;
+
+    this_thread::sleep_for(chrono::seconds(4));
+
+    cout << "TTL despues de expirar: "
+        << kv.ttl("usuario") << endl;
+
+    cout << "TTL inexistente: "
+        << kv.ttl("cualquierclave") << endl;
+
+    cout << endl << "--- TTL CON AVL ---" << endl;
+
+    kv.set("temporal2", "prueba");
+    kv.expire("temporal2", 2);
+
+    this_thread::sleep_for(chrono::seconds(3));
+
+    cout << "COUNT temporal2: "
+        << kv.count("temporal2", "temporal2") << endl;
+
+    cout << "EXISTS temporal2: "
+        << kv.exists("temporal2") << endl;
+    
+
+    cout << endl << "-- MINHEAP TTL ---" << endl;
+
+    kv.set("clave1", "hola");
+    kv.set("clave2", "mundo");
+
+    kv.expire("clave1", 2);
+    kv.expire("clave2", 5);
+
+    cout << "Antes: " << kv.count("clave1", "clave2") << endl;
+
+    this_thread::sleep_for(chrono::seconds(3));
+
+    cout << "Despues de 3 segundos: "
+        << kv.count("clave1", "clave2") << endl;
+
+    cout << "EXISTS clave1: " << kv.exists("clave1") << endl;
+    cout << "EXISTS clave2: " << kv.exists("clave2") << endl;
+
+    cout << endl << "--- prueba ttl 2 ---" << endl;
+
+    kv.set("renovable", "dato");
+
+    kv.expire("renovable", 1);
+    kv.expire("renovable", 10);
+
+    this_thread::sleep_for(chrono::seconds(2));
+
+    cout << "EXISTS renovable: "
+        << kv.exists("renovable") << endl;
+
+    cout << "TTL renovable: "
+        << kv.ttl("renovable") << endl;
+
+    cout << endl << "--- SET NX ---" << endl;
+
+    cout << "Primera insercion: "
+        << kv.setNX("curso", "EDA2") << endl;
+
+    cout << "Segunda insercion: "
+        << kv.setNX("curso", "Programacion") << endl;
+
+    cout << "Valor final: " << kv.get("curso")->valor << endl;
+
+
+    cout << endl << "--- SET EX ---" << endl;
+
+    cout << "SET EX: "
+        << kv.setEX("sesion", "activa", 2) << endl;
+
+    cout << "TTL inicial: " << kv.ttl("sesion") << endl;
+
+    this_thread::sleep_for(chrono::seconds(3));
+
+    cout << "EXISTS sesion: "
+        << kv.exists("sesion") << endl;
+        
     return 0;
 }
 
