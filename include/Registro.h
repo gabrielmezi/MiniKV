@@ -17,6 +17,7 @@ struct Registro {
     TipoDato tipo = TipoDato::STRING;
     bool estadoTTL = false;
     time_t expira = 0;
+    unsigned long long versionTTL = 0;
 
     Registro(string c, string v, TipoDato t, bool ttl, time_t ex) {
         clave = c;
@@ -26,3 +27,4 @@ struct Registro {
         expira = ex;
     }
 };
+

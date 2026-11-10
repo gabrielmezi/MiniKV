@@ -188,7 +188,15 @@ int main() {
 
     cout << "EXISTS sesion: "
         << kv.exists("sesion") << endl;
-        
+    
+    cout << endl << "--- prueba stats con hash colisiones ---" << endl;
+
+    HashTable pruebaHash(5);
+
+    cout << "Elementos: " << pruebaHash.obtenerElementos() << endl;
+    cout << "Capacidad: " << pruebaHash.obtenerCapacidad() << endl;
+    cout << "Colisiones: " << pruebaHash.contarColisiones() << endl;
+    
     return 0;
 }
 

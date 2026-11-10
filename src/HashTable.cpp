@@ -143,3 +143,30 @@ void HashTable::imprimir() {
     }
     cout << "\n";
 }
+
+int HashTable::obtenerElementos() {
+    return elementos;
+}
+
+int HashTable::obtenerCapacidad() {
+    return capacidad;
+}
+
+int HashTable::contarColisiones() {
+    int colisiones = 0;
+
+    for (int i = 0; i < capacidad; i++) {
+        Nodo* actual = tabla[i];
+
+        if (actual != nullptr) {
+            actual = actual->siguiente;
+
+            while (actual != nullptr) {
+                colisiones++;
+                actual = actual->siguiente;
+            }
+        }
+    }
+
+    return colisiones;
+}

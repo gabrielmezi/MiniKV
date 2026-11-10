@@ -33,4 +33,8 @@ public:
     bool eliminar(string clave);
 
     void imprimir();
+
+    int obtenerElementos();
+    int obtenerCapacidad();
+    int contarColisiones();
 };

@@ -40,6 +40,11 @@ private:
     void rango(NodoAVL* nodo, string inicio, string fin, vector<Registro*>& resultados, int limite);
 
     void prefijo(NodoAVL* nodo, string p, vector<Registro*>& resultados, int limite);
+
+    int contarMenores(string clave);
+    int contarMenoresIguales(string clave);
+
+    void dump(NodoAVL* nodo, vector<Registro*>& resultados, int limite);
 public:
     ArbolAVL();
     ~ArbolAVL();
@@ -56,6 +61,10 @@ public:
     Registro* predecesor(string clave);
     vector<Registro*> rango(string inicio, string fin, int limite = -1);
     vector<Registro*> prefijo(string p, int limite = -1);
+
+    int contarRango(string inicio, string fin);
+
+    vector<Registro*> dump(int limite = 50);
 };
 
 
