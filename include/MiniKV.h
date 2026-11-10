@@ -20,7 +20,7 @@ private:
     int cantidadBool = 0;
 
     void limpiarExpirados();
-    
+
     void aumentarTipo(TipoDato tipo);
     void disminuirTipo(TipoDato tipo);
 public:
@@ -55,4 +55,5 @@ public:
 
     void stats();
 
+    bool save(string archivo);
 };

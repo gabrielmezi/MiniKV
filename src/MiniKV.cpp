@@ -234,3 +234,31 @@ void MiniKV::disminuirTipo(TipoDato tipo) {
         case TipoDato::BOOL: cantidadBool--; break;
     }
 }
+
+
+bool MiniKV::save(string archivo) {
+    limpiarExpirados();
+
+    ofstream salida(archivo);
+
+    if (!salida.is_open()) {
+        return false;
+    }
+
+    vector<Registro*> registros = arbol.dump(-1);
+
+    salida << "MINIKV1" << endl;
+    salida << registros.size() << endl;
+
+    for (Registro* r : registros) {
+        salida << quoted(r->clave) << " "
+               << quoted(r->valor) << " "
+               << (int)r->tipo << " "
+               << r->estadoTTL << " "
+               << r->expira << endl;
+    }
+
+    salida.close();
+
+    return salida.good();
+}

@@ -240,6 +240,19 @@ int main() {
     delete b;
     delete c;
 
+    cout << endl << "--- SAVE ---" << endl;
+
+    kv.set("universidad", "UTP");
+    kv.set("curso", "Estructuras de Datos 2");
+    kv.set("ciclo", "4", TipoDato::INT);
+
+    if (kv.save("datos.txt")) {
+        cout << "Archivo guardado correctamente" << endl;
+    }
+    else {
+        cout << "Error al guardar el archivo" << endl;
+    }
+
     return 0;
 }
 
