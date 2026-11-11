@@ -262,3 +262,108 @@ bool MiniKV::save(string archivo) {
 
     return salida.good();
 }
+
+bool MiniKV::load(string archivo) {
+    ifstream entrada(archivo);
+
+    if (!entrada.is_open()) return false;
+
+    string cabecera;
+    int cantidad;
+
+    if (!(entrada >> cabecera >> cantidad)) return false;
+
+    if (cabecera != "MINIKV1" || cantidad < 0)
+        return false;
+
+    struct DatoCarga {
+        string clave;
+        string valor;
+        TipoDato tipo;
+        bool tieneTTL;
+        time_t expira;
+    };
+
+    vector<DatoCarga> datos;
+
+    for (int i = 0; i < cantidad; i++) {
+        string clave, valor;
+        int tipo, ttl;
+        long long expira;
+
+        if (!(entrada >> quoted(clave)
+                     >> quoted(valor)
+                     >> tipo >> ttl >> expira)) {
+            return false;
+        }
+
+        if (tipo < 0 || tipo > 3) return false;
+        if (ttl != 0 && ttl != 1) return false;
+        if (expira < 0) return false;
+        if (ttl == 0 && expira != 0) return false;
+        if (ttl == 1 && expira == 0) return false;
+
+        if (!datos.empty() && clave <= datos.back().clave)
+            return false;
+
+        DatoCarga dato;
+
+        dato.clave = clave;
+        dato.valor = valor;
+        dato.tipo = (TipoDato)tipo;
+        dato.tieneTTL = (ttl == 1);
+        dato.expira = (time_t)expira;
+
+        if ((long long)dato.expira != expira)
+            return false;
+
+        datos.push_back(dato);
+    }
+
+    string extra;
+    if (entrada >> extra) return false;
+    if (entrada.bad()) return false;
+
+    entrada.close();
+
+    vector<Registro*> anteriores = arbol.dump(-1);
+    vector<string> claves;
+
+    for (Registro* r : anteriores) {
+        claves.push_back(r->clave);
+    }
+
+    for (string clave : claves) {
+        del(clave);
+    }
+
+    heapTTL = MinHeap();
+
+    time_t ahora = time(nullptr);
+
+    for (DatoCarga& dato : datos) {
+        if (dato.tieneTTL && dato.expira <= ahora)
+            continue;
+
+        set(dato.clave, dato.valor, dato.tipo);
+
+        if (dato.tieneTTL) {
+            Registro* r = hash.buscar(dato.clave);
+
+            r->estadoTTL = true;
+            r->expira = dato.expira;
+
+            siguienteVersion++;
+            r->versionTTL = siguienteVersion;
+
+            EventoTTL evento;
+            evento.clave = dato.clave;
+            evento.expira = dato.expira;
+            evento.version = r->versionTTL;
+
+            heapTTL.insert(evento);
+        }
+    }
+
+    return true;
+}

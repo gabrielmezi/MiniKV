@@ -253,6 +253,60 @@ int main() {
         cout << "Error al guardar el archivo" << endl;
     }
 
+    cout << endl << "--- PRUEBA SAVE Y LOAD ---" << endl;
+
+    kv.set("prueba1", "hola");
+    kv.set("prueba2", "123", TipoDato::INT);
+
+    cout << "SAVE: " << kv.save("prueba.txt") << endl;
+
+    kv.del("prueba1");
+    kv.del("prueba2");
+
+    cout << "Antes de LOAD: " << kv.exists("prueba1") << endl;
+
+    cout << "LOAD: " << kv.load("prueba.txt") << endl;
+
+    Registro* r2 = kv.get("prueba1");
+
+    if (r2 != nullptr) {
+        cout << "Valor recuperado: " << r2->valor << endl;
+    }
+
+    r2 = kv.get("prueba2");
+
+    if (r2 != nullptr) {
+        cout << "Tipo INT recuperado: "
+            << (r2->tipo == TipoDato::INT) << endl;
+    }
+
+    cout << endl << "--- LOAD CORRUPTO ---" << endl;
+
+    kv.set("seguro", "no borrar");
+
+    ofstream archivo("corrupto.txt");
+    archivo << "ARCHIVO_INVALIDO" << endl;
+    archivo.close();
+
+    cout << "LOAD corrupto: " << kv.load("corrupto.txt") << endl;
+    cout << "EXISTS seguro: " << kv.exists("seguro") << endl;
+
+    cout << endl << "--- LOAD CON TTL ---" << endl;
+
+    kv.setEX("sesionTTL", "activa", 5);
+    kv.save("ttl_prueba.txt");
+
+    this_thread::sleep_for(chrono::seconds(2));
+
+    kv.load("ttl_prueba.txt");
+
+    cout << "TTL restaurado: " << kv.ttl("sesionTTL") << endl;
+
+    this_thread::sleep_for(chrono::seconds(4));
+
+    cout << "EXISTS despues de expirar: "
+     << kv.exists("sesionTTL") << endl;
+
     return 0;
 }
 

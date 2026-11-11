@@ -1,0 +1,15 @@
+MINIKV1
+13
+"activo" "true" 3 0 0
+"ana" "estudiante" 0 0 0
+"chucky" "ure" 0 0 0
+"ciclo" "4" 1 0 0
+"curso" "Estructuras de Datos 2" 0 0 0
+"edad" "veinte" 0 0 0
+"nombre" "Gabriel" 0 0 0
+"pedro" "docente" 0 0 0
+"prueba1" "hola" 0 0 0
+"prueba2" "123" 1 0 0
+"renovable" "dato" 0 1 1794399732
+"salazar" "imbecil" 0 0 0
+"universidad" "UTP" 0 0 0

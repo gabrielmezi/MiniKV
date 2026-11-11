@@ -8,6 +8,6 @@ MINIKV1
 "edad" "veinte" 0 0 0
 "nombre" "Gabriel" 0 0 0
 "pedro" "docente" 0 0 0
-"renovable" "dato" 0 1 1794357685
+"renovable" "dato" 0 1 1794399732
 "salazar" "imbecil" 0 0 0
 "universidad" "UTP" 0 0 0
