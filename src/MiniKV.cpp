@@ -477,3 +477,44 @@ int MiniKV::cargarCSV(string archivo) {
 }
 
 
+
+
+bool MiniKV::validarTipo(string valor, TipoDato tipo) {
+    if (tipo == TipoDato::STRING) {
+        return true;
+    }
+
+    if (tipo == TipoDato::BOOL) {
+        return valor == "true" || valor == "false";
+    }
+
+    if (tipo == TipoDato::INT) {
+        if (valor.empty()) return false;
+
+        size_t pos = 0;
+
+        try {
+            stoll(valor, &pos);
+            return pos == valor.size();
+        }
+        catch (...) {
+            return false;
+        }
+    }
+
+    if (tipo == TipoDato::FLOAT) {
+        if (valor.empty()) return false;
+
+        size_t pos = 0;
+
+        try {
+            stod(valor, &pos);
+            return pos == valor.size();
+        }
+        catch (...) {
+            return false;
+        }
+    }
+
+    return false;
+}

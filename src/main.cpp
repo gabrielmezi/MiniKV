@@ -35,37 +35,99 @@ int main() {
             break;
         }
 
+
         else if (comando == "SET") {
-            string clave, valor, tipoTexto, extra;
+            string clave, valor;
+            string opcion, extra;
 
             if (!(ss >> clave >> valor)) {
-                cout << "Uso: SET clave valor [tipo]" << endl;
+                cout << "Uso: SET clave valor [NX | EX segundos | tipo]" << endl;
                 continue;
             }
 
-            TipoDato tipo = TipoDato::STRING;
-
-            if (ss >> tipoTexto) {
-                if (tipoTexto == "INT") {
-                    tipo = TipoDato::INT;
-                } else if (tipoTexto == "FLOAT") {
-                    tipo = TipoDato::FLOAT;
-                } else if (tipoTexto == "BOOL") {
-                    tipo = TipoDato::BOOL;
-                } else if (tipoTexto != "STRING") {
-                    cout << "Tipo invalido" << endl;
+            if (!(ss >> opcion)) {
+                kv.set(clave, valor);
+                cout << "OK" << endl;
+            }
+            else if (opcion == "NX") {
+                if (ss >> extra) {
+                    cout << "Demasiados argumentos" << endl;
                     continue;
                 }
-            }
 
-            if (ss >> extra) {
-                cout << "Demasiados argumentos" << endl;
-                continue;
+                if (kv.setNX(clave, valor)) {
+                    cout << "OK" << endl;
+                }
+                else {
+                    cout << "(nil)" << endl;
+                }
             }
+            else if (opcion == "EX") {
+                string textoSegundos;
 
-            kv.set(clave, valor, tipo);
-            cout << "OK" << endl;
+                if (!(ss >> textoSegundos) || (ss >> extra)) {
+                    cout << "Uso: SET clave valor EX segundos" << endl;
+                    continue;
+                }
+
+                int segundos;
+
+                try {
+                    size_t pos = 0;
+                    segundos = stoi(textoSegundos, &pos);
+
+                    if (pos != textoSegundos.size() || segundos <= 0) {
+                        cout << "Segundos invalidos" << endl;
+                        continue;
+                    }
+                }
+                catch (...) {
+                    cout << "Segundos invalidos" << endl;
+                    continue;
+                }
+
+                if (kv.setEX(clave, valor, segundos)) {
+                    cout << "OK" << endl;
+                }
+                else {
+                    cout << "ERROR" << endl;
+                }
+            }
+            else {
+                TipoDato tipo;
+
+                if (opcion == "STRING") {
+                    tipo = TipoDato::STRING;
+                }
+                else if (opcion == "INT") {
+                    tipo = TipoDato::INT;
+                }
+                else if (opcion == "FLOAT") {
+                    tipo = TipoDato::FLOAT;
+                }
+                else if (opcion == "BOOL") {
+                    tipo = TipoDato::BOOL;
+                }
+                else {
+                    cout << "Opcion o tipo invalido" << endl;
+                    continue;
+                }
+
+                if (ss >> extra) {
+                    cout << "Demasiados argumentos" << endl;
+                    continue;
+                }
+
+                if (!kv.validarTipo(valor, tipo)) {
+                    cout << "ERROR: valor incompatible con el tipo" << endl;
+                    continue;
+                }
+
+                kv.set(clave, valor, tipo);
+                cout << "OK" << endl;
+            }
         }
+
 
         else if (comando == "GET") {
             string clave;
@@ -237,13 +299,106 @@ int main() {
             }
 
             cout << kv.ttl(clave) << endl;
+        } else if (comando == "DUMP") {
+            string argumento, extra;
+            int limite = 50;
+
+            if (ss >> argumento) {
+                try {
+                    size_t pos = 0;
+                    limite = stoi(argumento, &pos);
+
+                    if (pos != argumento.size() || limite < 0) {
+                        cout << "Limite invalido" << endl;
+                        continue;
+                    }
+                }
+                catch (...) {
+                    cout << "Limite invalido" << endl;
+                    continue;
+                }
+            }
+
+            if (ss >> extra) {
+                cout << "Demasiados argumentos" << endl;
+                continue;
+            }
+
+            vector<Registro*> registros = kv.dump(limite);
+
+            for (Registro* r : registros) {
+                cout << r->clave << ": " << r->valor << endl;
+            }
+
+            cout << "Total mostrado: " << registros.size() << endl;
+        }
+
+        else if (comando == "STATS") {
+            string extra;
+
+            if (ss >> extra) {
+                cout << "Uso: STATS" << endl;
+                continue;
+            }
+
+            kv.stats();
+        }
+
+        else if (comando == "SAVE") {
+            string archivo, extra;
+
+            if (!(ss >> archivo) || (ss >> extra)) {
+                cout << "Uso: SAVE archivo" << endl;
+                continue;
+            }
+
+            if (kv.save(archivo)) {
+                cout << "OK" << endl;
+            }
+            else {
+                cout << "ERROR: no se pudo guardar" << endl;
+            }
+        }
+
+        else if (comando == "LOAD") {
+            string archivo, extra;
+
+            if (!(ss >> archivo) || (ss >> extra)) {
+                cout << "Uso: LOAD archivo" << endl;
+                continue;
+            }
+
+            if (kv.load(archivo)) {
+                cout << "OK" << endl;
+            }
+            else {
+                cout << "ERROR: no se pudo cargar" << endl;
+            }
+        }
+
+        else if (comando == "CSV") {
+            string archivo, extra;
+
+            if (!(ss >> archivo) || (ss >> extra)) {
+                cout << "Uso: CSV archivo" << endl;
+                continue;
+            }
+
+            int cargados = kv.cargarCSV(archivo);
+
+            if (cargados == -1) {
+                cout << "ERROR: no se pudo cargar el CSV" << endl;
+            }
+            else {
+                cout << "Filas cargadas: " << cargados << endl;
+            }
         }
 
         else {
             cout << "Comando desconocido: " << comando << endl;
         }
 
+       
     }
     return 0;
 }
-
