@@ -216,6 +216,28 @@ int main() {
             }
         }
 
+        else if (comando == "EXPIRE") {
+            string clave, extra;
+            int segundos;
+
+            if (!(ss >> clave >> segundos) || (ss >>extra)) {
+                cout << "USO: EXPIRE clave segundos" << endl;
+                continue;
+            }
+
+            cout << kv.expire(clave, segundos) << endl;
+        }
+
+        else if (comando == "TTL") {
+            string clave, extra;
+
+            if (!(ss >> clave) || (ss >> extra)) {
+                cout << "Uso: TTL clave" << endl;
+                continue;
+            }
+
+            cout << kv.ttl(clave) << endl;
+        }
 
         else {
             cout << "Comando desconocido: " << comando << endl;
@@ -224,3 +246,4 @@ int main() {
     }
     return 0;
 }
+
