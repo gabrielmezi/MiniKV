@@ -367,3 +367,113 @@ bool MiniKV::load(string archivo) {
 
     return true;
 }
+
+static bool separarCSV(string linea, vector<string>& campos) {
+    string campo = "";
+    bool entreComillas = false;
+
+    for (int i = 0; i < (int)linea.size(); i++) {
+        char c = linea[i];
+
+        if (c == '"') {
+            if (entreComillas && i + 1 < (int)linea.size()
+                && linea[i + 1] == '"') {
+                campo += '"';
+                i++;
+            }
+            else {
+                entreComillas = !entreComillas;
+            }
+        }
+        else if (c == ',' && !entreComillas) {
+            campos.push_back(campo);
+            campo = "";
+        }
+        else {
+            campo += c;
+        }
+    }
+
+    if (entreComillas) return false;
+
+    if (!campo.empty() && campo.back() == '\r') {
+        campo.pop_back();
+    }
+
+    campos.push_back(campo);
+
+    return true;
+}
+
+int MiniKV::cargarCSV(string archivo) {
+    ifstream entrada(archivo);
+
+    if (!entrada.is_open()) {
+        return -1;
+    }
+
+    string linea;
+    int cargados = 0;
+    int rechazados = 0;
+
+    // leer cabecera
+    if (!getline(entrada, linea)) return -1;
+
+    if (!linea.empty() && linea.back() == '\r') {
+        linea.pop_back();
+    }
+
+    if (linea != "clave,valor,tipo") return -1;
+
+    while (getline(entrada, linea)) {
+        if (linea.empty()) continue;
+
+        vector<string> campos;
+
+        if (!separarCSV(linea, campos) || campos.size() != 3) {
+            rechazados++;
+            continue;
+        }
+
+        string clave = campos[0];
+        string valor = campos[1];
+        string tipoTexto = campos[2];
+
+        TipoDato tipo;
+
+        if (clave.empty()) {
+            rechazados++;
+            continue;
+        }
+
+        if (tipoTexto == "STRING") {
+            tipo = TipoDato::STRING;
+        }
+        else if (tipoTexto == "INT") {
+            tipo = TipoDato::INT;
+        }
+        else if (tipoTexto == "FLOAT") {
+            tipo = TipoDato::FLOAT;
+        }
+        else if (tipoTexto == "BOOL") {
+            tipo = TipoDato::BOOL;
+        }
+        else {
+            rechazados++;
+            continue;
+        }
+
+        set(clave, valor, tipo);
+        cargados++;
+    }
+
+    if (entrada.bad()) {
+        return -1;
+    }
+
+    cout << "Registros rechazados: " << rechazados << endl;
+
+    return cargados;
+}
+
+

@@ -57,5 +57,8 @@ public:
 
     bool save(string archivo);
     bool load(string archivo);
+    
+
+    int cargarCSV(string archivo);
 };
- 
+

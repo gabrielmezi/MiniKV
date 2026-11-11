@@ -305,24 +305,28 @@ void ArbolAVL::prefijo(NodoAVL* nodo, string p,
                        vector<Registro*>& resultados, int limite) {
     if (nodo == nullptr) return;
 
-    if (limite >= 0 && (int)resultados.size() >= limite) return;
+    if (limite >= 0 && (int)resultados.size() >= limite)
+        return;
 
     string clave = nodo->registro->clave;
 
-    if (clave >= p) {
+    int comparacion = clave.compare(0, p.size(), p);
+
+    if (comparacion >= 0) {
         prefijo(nodo->izquierda, p, resultados, limite);
     }
 
-    if (clave.compare(0, p.size(), p) == 0) {
+    if (comparacion == 0) {
         if (limite < 0 || (int)resultados.size() < limite) {
             resultados.push_back(nodo->registro);
         }
     }
 
-    if (clave <= p || clave.compare(0, p.size(), p) == 0) {
+    if (comparacion <= 0) {
         prefijo(nodo->derecha, p, resultados, limite);
     }
 }
+
 
 vector<Registro*> ArbolAVL::prefijo(string p, int limite) {
     vector<Registro*> resultados;
