@@ -10,7 +10,6 @@ Nodo::Nodo(Registro* r) {
     siguiente = nullptr;
 }
 
-
 int HashTable::hashFuncion(string clave) {
     unsigned long long h = 5381;
 
@@ -20,7 +19,6 @@ int HashTable::hashFuncion(string clave) {
 
     return h % capacidad;
 }
-
 
 void HashTable::rehash(int nuevaCapacidad) {
     vector<Nodo*> viejaTabla = tabla;
@@ -174,3 +172,4 @@ int HashTable::obtenerCapacidad() {
 int HashTable::contarColisiones() {
     return colisiones;
 }
+
