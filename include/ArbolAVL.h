@@ -65,6 +65,7 @@ public:
     int contarRango(string inicio, string fin);
 
     vector<Registro*> dump(int limite = 50);
+    int alturaArbol();
 };
 
 

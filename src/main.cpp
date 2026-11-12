@@ -342,6 +342,8 @@ int main() {
             }
 
             kv.stats();
+        } else if (comando == "ALTURA") {
+            cout << "Altura AVL: " << kv.alturaAVL() << endl;
         }
 
         else if (comando == "SAVE") {
@@ -402,3 +404,4 @@ int main() {
     }
     return 0;
 }
+

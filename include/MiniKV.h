@@ -62,5 +62,6 @@ public:
     int cargarCSV(string archivo);
 
     bool validarTipo(string valor, TipoDato tipo);
+    int alturaAVL();
 };
 

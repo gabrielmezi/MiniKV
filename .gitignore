@@ -5,3 +5,5 @@
 /src/datos.csv
 /old
 /old/*
+/tests
+/tests/*

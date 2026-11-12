@@ -405,3 +405,6 @@ vector<Registro*> ArbolAVL::dump(int limite) {
     return resultados;
 }
 
+int ArbolAVL::alturaArbol() {
+    return obtenerAltura(raiz);
+}

@@ -263,6 +263,7 @@ bool MiniKV::save(string archivo) {
     return salida.good();
 }
 
+
 bool MiniKV::load(string archivo) {
     ifstream entrada(archivo);
 
@@ -297,6 +298,7 @@ bool MiniKV::load(string archivo) {
             return false;
         }
 
+        if (clave.empty()) return false;
         if (tipo < 0 || tipo > 3) return false;
         if (ttl != 0 && ttl != 1) return false;
         if (expira < 0) return false;
@@ -306,11 +308,17 @@ bool MiniKV::load(string archivo) {
         if (!datos.empty() && clave <= datos.back().clave)
             return false;
 
+        TipoDato tipoDato = (TipoDato)tipo;
+
+        if (!validarTipo(valor, tipoDato)) {
+            return false;
+        }
+
         DatoCarga dato;
 
         dato.clave = clave;
         dato.valor = valor;
-        dato.tipo = (TipoDato)tipo;
+        dato.tipo = tipoDato;
         dato.tieneTTL = (ttl == 1);
         dato.expira = (time_t)expira;
 
@@ -368,6 +376,7 @@ bool MiniKV::load(string archivo) {
     return true;
 }
 
+
 static bool separarCSV(string linea, vector<string>& campos) {
     string campo = "";
     bool entreComillas = false;
@@ -405,6 +414,7 @@ static bool separarCSV(string linea, vector<string>& campos) {
     return true;
 }
 
+
 int MiniKV::cargarCSV(string archivo) {
     ifstream entrada(archivo);
 
@@ -416,7 +426,7 @@ int MiniKV::cargarCSV(string archivo) {
     int cargados = 0;
     int rechazados = 0;
 
-    // leer cabecera
+    // Leer cabecera
     if (!getline(entrada, linea)) return -1;
 
     if (!linea.empty() && linea.back() == '\r') {
@@ -463,6 +473,12 @@ int MiniKV::cargarCSV(string archivo) {
             continue;
         }
 
+
+        if (!validarTipo(valor, tipo)) {
+            rechazados++;
+            continue;
+        }
+
         set(clave, valor, tipo);
         cargados++;
     }
@@ -475,8 +491,6 @@ int MiniKV::cargarCSV(string archivo) {
 
     return cargados;
 }
-
-
 
 
 bool MiniKV::validarTipo(string valor, TipoDato tipo) {
@@ -517,4 +531,9 @@ bool MiniKV::validarTipo(string valor, TipoDato tipo) {
     }
 
     return false;
+}
+
+int MiniKV::alturaAVL() {
+    limpiarExpirados();
+    return arbol.alturaArbol();
 }
