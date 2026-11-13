@@ -352,8 +352,6 @@ int main() {
                 continue;
             }
 
-            int hashAntes = kv.cantidadHash();
-            int avlAntes = kv.cantidadAVL();
             auto inicioCarga = chrono::steady_clock::now();
             int cargados = kv.cargarCSV(archivo);
             auto finCarga = chrono::steady_clock::now();
@@ -366,8 +364,8 @@ int main() {
                 int hashDespues = kv.cantidadHash();
                 int avlDespues = kv.cantidadAVL();
                 cout << "Filas aceptadas: " << cargados << endl;
-                cout << "Claves nuevas en HashTable: " << hashDespues - hashAntes << endl;
-                cout << "Claves nuevas en AVL: " << avlDespues - avlAntes << endl;
+                cout << "Claves nuevas en HashTable: " << kv.clavesNuevasCSV() << endl;
+                cout << "Claves nuevas en AVL: " << kv.clavesNuevasCSV() << endl;
                 cout << "Total HashTable: " << hashDespues << endl;
                 cout << "Total AVL: " << avlDespues << endl;
                 cout << "Tiempo de carga: " << ms << " ms" << endl;

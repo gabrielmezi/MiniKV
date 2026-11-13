@@ -47,6 +47,8 @@ private:
     void dump(NodoAVL* nodo, vector<Registro*>& resultados, int limite);
 public:
     ArbolAVL();
+    ArbolAVL(const ArbolAVL&) = delete;
+    ArbolAVL& operator=(const ArbolAVL&) = delete;
     ~ArbolAVL();
 
     void insertar(Registro* r);

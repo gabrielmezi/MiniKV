@@ -18,6 +18,7 @@ private:
     int cantidadInt = 0;
     int cantidadFloat = 0;
     int cantidadBool = 0;
+    int nuevasCSV = 0;
 
     void limpiarExpirados();
 
@@ -60,6 +61,7 @@ public:
     
 
     int cargarCSV(string archivo);
+    int clavesNuevasCSV();
 
     bool validarTipo(string valor, TipoDato tipo);
     int alturaAVL();

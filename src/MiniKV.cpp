@@ -461,6 +461,7 @@ static bool separarCSV(string linea, vector<string>& campos) {
 
 
 int MiniKV::cargarCSV(string archivo) {
+    nuevasCSV = 0;
     ifstream entrada(archivo);
 
     if (!entrada.is_open()) {
@@ -524,7 +525,7 @@ int MiniKV::cargarCSV(string archivo) {
             continue;
         }
 
-        set(clave, valor, tipo);
+        if (set(clave, valor, tipo)) nuevasCSV++;
         cargados++;
     }
 
@@ -590,4 +591,8 @@ int MiniKV::cantidadHash() {
 int MiniKV::cantidadAVL() {
     limpiarExpirados();
     return arbol.cantidadNodos();
+}
+
+int MiniKV::clavesNuevasCSV() {
+    return nuevasCSV;
 }

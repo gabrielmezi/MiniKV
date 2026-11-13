@@ -24,6 +24,8 @@ private:
 
 public:
     HashTable(int cap = 8);
+    HashTable(const HashTable&) = delete;
+    HashTable& operator=(const HashTable&) = delete;
 
     ~HashTable();
 
