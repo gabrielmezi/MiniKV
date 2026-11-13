@@ -408,3 +408,6 @@ vector<Registro*> ArbolAVL::dump(int limite) {
 int ArbolAVL::alturaArbol() {
     return obtenerAltura(raiz);
 }
+int ArbolAVL::cantidadNodos() {
+    return obtenerTamano(raiz);
+}

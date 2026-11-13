@@ -6,6 +6,29 @@
 
 using namespace std;
 
+static bool leerLimite(stringstream& ss, int& limite) {
+    string primero, numero, extra;
+    if (!(ss >> primero)) return true;
+
+    if (primero == "LIMIT") {
+        if (!(ss >> numero)) return false;
+    } else {
+        numero = primero;
+    }
+
+    if (ss >> extra) return false;
+
+    try {
+        size_t pos = 0;
+        int n = stoi(numero, &pos);
+        if (pos != numero.size() || n < 0) return false;
+        limite = n;
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
 int main() {
     MiniKV kv;
 
@@ -37,97 +60,76 @@ int main() {
 
 
         else if (comando == "SET") {
-            string clave, valor;
-            string opcion, extra;
-
+            string clave, valor, opcion;
             if (!(ss >> clave >> valor)) {
-                cout << "Uso: SET clave valor [NX | EX segundos | tipo]" << endl;
+                cout << "Uso: SET clave valor [STRING|INT|FLOAT|BOOL] [EX segundos] [NX]" << endl;
                 continue;
             }
 
-            if (!(ss >> opcion)) {
-                kv.set(clave, valor);
-                cout << "OK" << endl;
-            }
-            else if (opcion == "NX") {
-                if (ss >> extra) {
-                    cout << "Demasiados argumentos" << endl;
-                    continue;
+            TipoDato tipo = TipoDato::STRING;
+            bool tieneTipo = false;
+            bool tieneEX = false;
+            bool tieneNX = false;
+            int segundos = 0;
+            bool valido = true;
+
+            while (ss >> opcion) {
+                if (opcion == "NX") {
+                    if (tieneNX) { valido = false; break; }
+                    tieneNX = true;
                 }
-
-                if (kv.setNX(clave, valor)) {
-                    cout << "OK" << endl;
-                }
-                else {
-                    cout << "(nil)" << endl;
-                }
-            }
-            else if (opcion == "EX") {
-                string textoSegundos;
-
-                if (!(ss >> textoSegundos) || (ss >> extra)) {
-                    cout << "Uso: SET clave valor EX segundos" << endl;
-                    continue;
-                }
-
-                int segundos;
-
-                try {
-                    size_t pos = 0;
-                    segundos = stoi(textoSegundos, &pos);
-
-                    if (pos != textoSegundos.size() || segundos <= 0) {
-                        cout << "Segundos invalidos" << endl;
-                        continue;
+                else if (opcion == "EX") {
+                    if (tieneEX) { valido = false; break; }
+                    tieneEX = true;
+                    string texto;
+                    if (!(ss >> texto)) { valido = false; break; }
+                    try {
+                        size_t pos = 0;
+                        segundos = stoi(texto, &pos);
+                        if (pos != texto.size() || segundos <= 0) valido = false;
+                    } catch (...) {
+                        valido = false;
                     }
+                    if (!valido) break;
                 }
-                catch (...) {
-                    cout << "Segundos invalidos" << endl;
-                    continue;
-                }
-
-                if (kv.setEX(clave, valor, segundos)) {
-                    cout << "OK" << endl;
+                else if (opcion == "STRING" || opcion == "INT" ||
+                         opcion == "FLOAT" || opcion == "BOOL") {
+                    if (tieneTipo) { valido = false; break; }
+                    tieneTipo = true;
+                    if (opcion == "INT") tipo = TipoDato::INT;
+                    else if (opcion == "FLOAT") tipo = TipoDato::FLOAT;
+                    else if (opcion == "BOOL") tipo = TipoDato::BOOL;
                 }
                 else {
-                    cout << "ERROR" << endl;
+                    valido = false;
+                    break;
                 }
+            }
+
+            if (!valido) {
+                cout << "Uso: SET clave valor [tipo] [EX segundos] [NX]" << endl;
+                continue;
+            }
+            if (!kv.validarTipo(valor, tipo)) {
+                cout << "ERROR: valor incompatible con el tipo" << endl;
+                continue;
+            }
+            if (tieneNX && kv.exists(clave)) {
+                cout << "(nil)" << endl;
+                continue;
+            }
+
+            if (tieneEX) {
+                cout << (kv.setEX(clave, valor, segundos, tipo) ? "OK" : "ERROR") << endl;
+            }
+            else if (tieneNX) {
+                cout << (kv.setNX(clave, valor, tipo) ? "OK" : "(nil)") << endl;
             }
             else {
-                TipoDato tipo;
-
-                if (opcion == "STRING") {
-                    tipo = TipoDato::STRING;
-                }
-                else if (opcion == "INT") {
-                    tipo = TipoDato::INT;
-                }
-                else if (opcion == "FLOAT") {
-                    tipo = TipoDato::FLOAT;
-                }
-                else if (opcion == "BOOL") {
-                    tipo = TipoDato::BOOL;
-                }
-                else {
-                    cout << "Opcion o tipo invalido" << endl;
-                    continue;
-                }
-
-                if (ss >> extra) {
-                    cout << "Demasiados argumentos" << endl;
-                    continue;
-                }
-
-                if (!kv.validarTipo(valor, tipo)) {
-                    cout << "ERROR: valor incompatible con el tipo" << endl;
-                    continue;
-                }
-
                 kv.set(clave, valor, tipo);
                 cout << "OK" << endl;
             }
         }
-
 
         else if (comando == "GET") {
             string clave;
@@ -166,46 +168,31 @@ int main() {
         } else if (comando == "RANGE") {
             string inicio, fin;
             int limite = -1;
-
-            if (!(ss >> inicio >> fin)) {
-                cout << "Uso: RANGE inicio fin [limite]" << endl;
-                continue;
-            }
-
-            if (ss >> limite && limite < 0) {
-                cout << "Limite invalido" << endl;
+            if (!(ss >> inicio >> fin) || !leerLimite(ss, limite)) {
+                cout << "Uso: RANGE inicio fin [LIMIT n]" << endl;
                 continue;
             }
 
             vector<Registro*> resultados = kv.range(inicio, fin, limite);
-
             for (Registro* r : resultados) {
                 cout << r->clave << ": " << r->valor << endl;
             }
-
             cout << "Total mostrado: " << resultados.size() << endl;
         }
 
         else if (comando == "PREFIX") {
             string prefijo;
             int limite = -1;
-
-            if (!(ss >> prefijo)) {
-                cout << "Uso: PREFIX prefijo [limite]" << endl;
+            if (!(ss >> prefijo) || !leerLimite(ss, limite)) {
+                cout << "Uso: PREFIX prefijo [LIMIT n]" << endl;
                 continue;
             }
-
-            if (ss >> limite && limite < 0) {
-                cout << "Limite invalido" << endl;
-                continue;
-            }
+            if (prefijo == "\"\"" || prefijo == "''") prefijo = "";
 
             vector<Registro*> resultados = kv.prefix(prefijo, limite);
-
             for (Registro* r : resultados) {
                 cout << r->clave << ": " << r->valor << endl;
             }
-
             cout << "Total mostrado: " << resultados.size() << endl;
         }
 
@@ -300,36 +287,16 @@ int main() {
 
             cout << kv.ttl(clave) << endl;
         } else if (comando == "DUMP") {
-            string argumento, extra;
             int limite = 50;
-
-            if (ss >> argumento) {
-                try {
-                    size_t pos = 0;
-                    limite = stoi(argumento, &pos);
-
-                    if (pos != argumento.size() || limite < 0) {
-                        cout << "Limite invalido" << endl;
-                        continue;
-                    }
-                }
-                catch (...) {
-                    cout << "Limite invalido" << endl;
-                    continue;
-                }
-            }
-
-            if (ss >> extra) {
-                cout << "Demasiados argumentos" << endl;
+            if (!leerLimite(ss, limite)) {
+                cout << "Uso: DUMP [LIMIT n]" << endl;
                 continue;
             }
 
             vector<Registro*> registros = kv.dump(limite);
-
             for (Registro* r : registros) {
                 cout << r->clave << ": " << r->valor << endl;
             }
-
             cout << "Total mostrado: " << registros.size() << endl;
         }
 
@@ -380,19 +347,30 @@ int main() {
 
         else if (comando == "CSV") {
             string archivo, extra;
-
             if (!(ss >> archivo) || (ss >> extra)) {
                 cout << "Uso: CSV archivo" << endl;
                 continue;
             }
 
+            int hashAntes = kv.cantidadHash();
+            int avlAntes = kv.cantidadAVL();
+            auto inicioCarga = chrono::steady_clock::now();
             int cargados = kv.cargarCSV(archivo);
+            auto finCarga = chrono::steady_clock::now();
 
             if (cargados == -1) {
                 cout << "ERROR: no se pudo cargar el CSV" << endl;
             }
             else {
-                cout << "Filas cargadas: " << cargados << endl;
+                double ms = chrono::duration<double, milli>(finCarga - inicioCarga).count();
+                int hashDespues = kv.cantidadHash();
+                int avlDespues = kv.cantidadAVL();
+                cout << "Filas aceptadas: " << cargados << endl;
+                cout << "Claves nuevas en HashTable: " << hashDespues - hashAntes << endl;
+                cout << "Claves nuevas en AVL: " << avlDespues - avlAntes << endl;
+                cout << "Total HashTable: " << hashDespues << endl;
+                cout << "Total AVL: " << avlDespues << endl;
+                cout << "Tiempo de carga: " << ms << " ms" << endl;
             }
         }
 

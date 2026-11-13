@@ -206,16 +206,61 @@ void MiniKV::limpiarExpirados() {
 void MiniKV::stats() {
     limpiarExpirados();
 
+    vector<Registro*> registros = arbol.dump(-1);
+    time_t ahora = time(nullptr);
+    int conTTL = 0;
+    long long minimoTTL = 0;
+    long long maximoTTL = 0;
+    long double sumaTTL = 0;
+    long long sumaLongitudes = 0;
+
+    for (Registro* r : registros) {
+        sumaLongitudes += r->clave.size();
+
+        if (r->estadoTTL) {
+            long long restante = (long long)(r->expira - ahora);
+            if (restante < 0) restante = 0;
+
+            if (conTTL == 0 || restante < minimoTTL) minimoTTL = restante;
+            if (conTTL == 0 || restante > maximoTTL) maximoTTL = restante;
+            sumaTTL += restante;
+            conTTL++;
+        }
+    }
+
     cout << "----- STATS -----" << endl;
     cout << "Elementos: " << hash.obtenerElementos() << endl;
     cout << "Capacidad HashTable: " << hash.obtenerCapacidad() << endl;
     cout << "Colisiones actuales: " << hash.contarColisiones() << endl;
-
     cout << "STRING: " << cantidadString << endl;
     cout << "INT: " << cantidadInt << endl;
     cout << "FLOAT: " << cantidadFloat << endl;
     cout << "BOOL: " << cantidadBool << endl;
+    cout << "Claves con TTL activo: " << conTTL << endl;
+
+    if (conTTL > 0) {
+        cout << "TTL minimo: " << minimoTTL << " segundos" << endl;
+        cout << "TTL maximo: " << maximoTTL << " segundos" << endl;
+        cout << "TTL promedio: " << (double)(sumaTTL / conTTL) << " segundos" << endl;
+    } else {
+        cout << "TTL minimo: N/A" << endl;
+        cout << "TTL maximo: N/A" << endl;
+        cout << "TTL promedio: N/A" << endl;
+    }
+
+    double longitudPromedio = registros.empty() ? 0.0 :
+        (double)sumaLongitudes / registros.size();
+    cout << "Longitud promedio de claves: " << longitudPromedio << endl;
+
+    if (!registros.empty()) {
+        cout << "Clave minima: " << registros.front()->clave << endl;
+        cout << "Clave maxima: " << registros.back()->clave << endl;
+    } else {
+        cout << "Clave minima: (nil)" << endl;
+        cout << "Clave maxima: (nil)" << endl;
+    }
 }
+
 
 void MiniKV::aumentarTipo(TipoDato tipo) {
     switch (tipo) {
@@ -536,4 +581,13 @@ bool MiniKV::validarTipo(string valor, TipoDato tipo) {
 int MiniKV::alturaAVL() {
     limpiarExpirados();
     return arbol.alturaArbol();
+}
+int MiniKV::cantidadHash() {
+    limpiarExpirados();
+    return hash.obtenerElementos();
+}
+
+int MiniKV::cantidadAVL() {
+    limpiarExpirados();
+    return arbol.cantidadNodos();
 }

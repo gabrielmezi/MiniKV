@@ -63,5 +63,7 @@ public:
 
     bool validarTipo(string valor, TipoDato tipo);
     int alturaAVL();
+    int cantidadHash();
+    int cantidadAVL();
 };
 

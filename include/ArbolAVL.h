@@ -66,6 +66,7 @@ public:
 
     vector<Registro*> dump(int limite = 50);
     int alturaArbol();
+    int cantidadNodos();
 };
 
 
