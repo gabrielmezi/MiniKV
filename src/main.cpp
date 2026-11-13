@@ -54,7 +54,7 @@ int main() {
         }
 
         if (comando == "EXIT") {
-            cout << "Borrando C:/Windows/System32" << endl;
+            cout << "Terminado" << endl;
             break;
         }
 

@@ -1,0 +1,10 @@
+Registros rechazados: 0
+
+GET con 10000 registros
+Repeticiones por caso: 10000
+
+Caso           Clave          Respuesta         Promedio (ms)
+Primera        kv000001       valor000001       0.000039
+Intermedia     kv005000       valor005000       0.000040
+Ultima         kv010000       valor010000       0.000039
+Inexistente    inexistente    (nil)             0.000039
